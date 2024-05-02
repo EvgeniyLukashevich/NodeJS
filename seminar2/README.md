@@ -25,5 +25,5 @@ const userAddress = user.createAddress();
 ```
 #### Генерация случайного пользователя (функция `createUser()` возвращает объект с полями ***firstName***, ***lastName***, ***userName***, ***email***, ***address***, заполненными случайно сгенерированными значеиями): 
 ```js
-const userObject = user.createAddress();
+const userObject = user.createUser();
 ```

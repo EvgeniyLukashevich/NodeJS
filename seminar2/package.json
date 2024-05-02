@@ -1,6 +1,6 @@
 {
   "name": "phive_generate_user",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Creating random user parameters, creating a user object with random parameters",
   "main": "index.js",
   "scripts": {
