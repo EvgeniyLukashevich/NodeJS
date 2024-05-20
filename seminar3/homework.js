@@ -1,11 +1,10 @@
 const express = require('express');
 const fs = require('fs');
+const exphbs = require('express-handlebars');
 const app = express();
 const PORT = 3000;
 
-
 const viewCountFile = 'viewCounts.json';
-
 
 const readViewCounts = () => {
     if (fs.existsSync(viewCountFile)) {
@@ -15,33 +14,45 @@ const readViewCounts = () => {
     return {};
 };
 
-
 const writeViewCounts = (viewCounts) => {
     fs.writeFileSync(viewCountFile, JSON.stringify(viewCounts, null, 2));
 };
 
 const viewCounts = readViewCounts();
 
-
 const updateViewCount = (page) => {
     viewCounts[page] = (viewCounts[page] || 0) + 1;
     writeViewCounts(viewCounts);
 };
 
-
-app.get('/', (req, res) => {
-    updateViewCount('/');
-    res.send(`<h1>Главная Страница</h1>
-<p>Просмотров: ${viewCounts['/']}</p>
-<a href="http://localhost:${PORT}/about">About</a>`);
+// Настройка системы шаблонов
+const hbs = exphbs.create({
+    extname: '.hbs',
+    defaultLayout: 'main'
 });
 
+app.engine('.hbs', hbs.engine, (err, html) => {
+    if (err) {
+        console.error('Error rendering template:', err);
+        return;
+    }
+    return html;
+});
+app.set('view engine', '.hbs');
+app.set('views', './views');
+
+// Использование express.static для управления статическими файлами
+app.use(express.static('public'));
+
+// Маршруты для различных страниц
+app.get('/', (req, res) => {
+    updateViewCount('/');
+    res.render('index', { title: 'Главная Страница', viewCount: viewCounts['/'] });
+});
 
 app.get('/about', (req, res) => {
     updateViewCount('/about');
-    res.send(`<h1>О сайте</h1>
-<p>Просмотров: ${viewCounts['/about']}</p>
-<a href="http://localhost:${PORT}/">Home</a>`);
+    res.render('about', { title: 'О сайте', viewCount: viewCounts['/about'] });
 });
 
 app.listen(PORT, () => {
